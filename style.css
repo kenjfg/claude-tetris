@@ -13,10 +13,29 @@ body {
   justify-content: center;
   min-height: 100vh;
   user-select: none;
+  transition: background 0.2s, color 0.2s;
 }
 
 .wrapper {
   position: relative;
+}
+
+.theme-toggle-btn {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: transparent;
+  border: 1px solid #2a2a3a;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.2s;
+}
+
+.theme-toggle-btn:hover {
+  background: #22222e;
 }
 
 .game-title {
@@ -158,4 +177,73 @@ kbd {
 
 #restart-btn:hover {
   background: #9bbdff;
+}
+
+/* ---- Light mode ---- */
+body.light-mode {
+  background: #f2f3f9;
+  color: #3a3a4a;
+}
+
+body.light-mode .theme-toggle-btn {
+  border-color: #d6d8e6;
+  color: #3a3a4a;
+}
+
+body.light-mode .theme-toggle-btn:hover {
+  background: #e4e6f4;
+}
+
+body.light-mode .game-title {
+  color: #4c6ef5;
+}
+
+body.light-mode #board {
+  border-color: #d6d8e6;
+  background: #ffffff;
+  box-shadow: 0 0 30px rgba(76, 110, 245, 0.12);
+}
+
+body.light-mode .label {
+  color: #8a8aa3;
+}
+
+body.light-mode .value {
+  color: #4c6ef5;
+}
+
+body.light-mode #next-canvas {
+  border-color: #d6d8e6;
+  background: #ffffff;
+}
+
+body.light-mode .controls li {
+  color: #6b6b80;
+}
+
+body.light-mode kbd {
+  background: #eceefa;
+  border-color: #d0d3e8;
+  color: #555570;
+}
+
+body.light-mode .overlay {
+  background: rgba(255, 255, 255, 0.8);
+}
+
+body.light-mode #overlay-title {
+  color: #e03131;
+}
+
+body.light-mode #overlay-score {
+  color: #4c6ef5;
+}
+
+body.light-mode #restart-btn {
+  background: #4c6ef5;
+  color: #ffffff;
+}
+
+body.light-mode #restart-btn:hover {
+  background: #6c8cff;
 }
