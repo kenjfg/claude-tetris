@@ -98,6 +98,24 @@ body {
   border-radius: 4px;
 }
 
+/* ---- Selector de tema / skin ---- */
+.skin-select {
+  background: #1a1a25;
+  color: #e0e0e0;
+  border: 1px solid #2a2a3a;
+  border-radius: 4px;
+  padding: 6px 8px;
+  font-family: inherit;
+  font-size: 12px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.2s;
+}
+
+.skin-select:hover {
+  border-color: #3a3a5a;
+}
+
 /* ---- Controles ---- */
 .controls ul {
   list-style: none;
@@ -217,6 +235,12 @@ body.light-mode #next-canvas {
   background: #ffffff;
 }
 
+body.light-mode .skin-select {
+  background: #ffffff;
+  color: #3a3a4a;
+  border-color: #d6d8e6;
+}
+
 body.light-mode .controls li {
   color: #6b6b80;
 }
@@ -246,4 +270,27 @@ body.light-mode #restart-btn {
 
 body.light-mode #restart-btn:hover {
   background: #6c8cff;
+}
+
+/* ---- Acento del marco del tablero por skin ----
+   Se limita al borde de los lienzos para no entrar en conflicto con el
+   modo claro/oscuro (que colorea el resto del cromo de la página). El
+   fondo del tablero y del next lo pinta game.js con el color de la skin. */
+body[data-skin="neon"] #board,
+body[data-skin="neon"] #next-canvas {
+  border-color: #00eaff;
+  background: #000000;
+  box-shadow: 0 0 24px rgba(0, 234, 255, 0.35);
+}
+
+body[data-skin="pastel"] #board,
+body[data-skin="pastel"] #next-canvas {
+  border-color: #ddd4c4;
+  background: #f4f1ea;
+}
+
+body[data-skin="pixel"] #board,
+body[data-skin="pixel"] #next-canvas {
+  border-color: #3a3a2a;
+  background: #12121a;
 }
