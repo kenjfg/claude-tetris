@@ -40,8 +40,17 @@ const overlayTitle = document.getElementById('overlay-title');
 const overlayScore = document.getElementById('overlay-score');
 const restartBtn = document.getElementById('restart-btn');
 const themeToggleBtn = document.getElementById('theme-toggle');
+const startOverlay = document.getElementById('start-overlay');
+const startRecords = document.getElementById('start-records');
+const overlayRecords = document.getElementById('overlay-records');
+const nameEntry = document.getElementById('name-entry');
+const nameInput = document.getElementById('name-input');
+const saveScoreBtn = document.getElementById('save-score-btn');
+const playBtn = document.getElementById('play-btn');
 
-let board, current, next, score, lines, level, paused, gameOver, lastTime, dropAccum, dropInterval, animId;
+let board, current, next, score, lines, level, paused, gameOver, lastTime, dropAccum, dropInterval, animId, combo, maxCombo;
+let started = false;
+let pendingRun = null;
 let lightMode = localStorage.getItem('tetris-theme') === 'light';
 
 function createBoard() {
@@ -110,7 +119,13 @@ function clearLines() {
     score += (LINE_SCORES[cleared] || 0) * level;
     level = Math.floor(lines / 10) + 1;
     dropInterval = Math.max(100, 1000 - (level - 1) * 90);
+    // Racha de combos: sube con cada bloqueo que limpia >=1 linea
+    combo += 1;
+    if (combo > maxCombo) maxCombo = combo;
     updateHUD();
+  } else {
+    // Bloqueo sin lineas: se corta la racha
+    combo = 0;
   }
 }
 
@@ -156,6 +171,114 @@ function updateHUD() {
   scoreEl.textContent = score.toLocaleString();
   linesEl.textContent = lines;
   levelEl.textContent = level;
+}
+
+/* ---- Tabla de records local (localStorage) ---- */
+const RECORDS_KEY = 'tetris.records';
+const MAX_RECORDS = 5;
+
+// Devuelve siempre una estructura valida aunque el almacenamiento falle o este vacio
+function loadRecords() {
+  const empty = { top: [], bestCombo: 0, maxLines: 0 };
+  try {
+    const raw = localStorage.getItem(RECORDS_KEY);
+    if (!raw) return empty;
+    const data = JSON.parse(raw);
+    const top = Array.isArray(data.top)
+      ? data.top
+          .filter(e => e && typeof e.score === 'number' && isFinite(e.score))
+          .map(e => ({ name: String(e.name || 'Anónimo').slice(0, 12), score: Math.floor(e.score) }))
+          .sort((a, b) => b.score - a.score)
+          .slice(0, MAX_RECORDS)
+      : [];
+    return {
+      top,
+      bestCombo: typeof data.bestCombo === 'number' && data.bestCombo > 0 ? Math.floor(data.bestCombo) : 0,
+      maxLines: typeof data.maxLines === 'number' && data.maxLines > 0 ? Math.floor(data.maxLines) : 0,
+    };
+  } catch (e) {
+    return empty;
+  }
+}
+
+function saveRecords(data) {
+  try {
+    localStorage.setItem(RECORDS_KEY, JSON.stringify(data));
+  } catch (e) {
+    /* almacenamiento no disponible: se ignora */
+  }
+}
+
+function clearRecords() {
+  try {
+    localStorage.removeItem(RECORDS_KEY);
+  } catch (e) {
+    /* almacenamiento no disponible: se ignora */
+  }
+}
+
+// true si la puntuacion entra en el top 5 actual
+function qualifiesForTop(sc, top) {
+  if (!sc || sc <= 0) return false;
+  if (top.length < MAX_RECORDS) return true;
+  return sc > top[top.length - 1].score;
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => (
+    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+  ));
+}
+
+// Pinta la tabla de records dentro del contenedor indicado.
+// runInfo: { highlightIndex } para resaltar la fila de la partida actual,
+//          { missedPosition } para mostrar "quedaste en la posicion N".
+function renderRecords(container, runInfo) {
+  if (!container) return;
+  const rec = loadRecords();
+  let html = '<span class="label">RECORDS</span>';
+  if (rec.top.length === 0) {
+    html += '<p class="records-empty">Aún no hay records</p>';
+  } else {
+    html += '<ol class="records-list">';
+    rec.top.forEach((e, i) => {
+      const hl = runInfo && runInfo.highlightIndex === i ? ' highlight' : '';
+      html += `<li class="record-row${hl}">` +
+        `<span class="record-name">${escapeHtml(e.name)}</span>` +
+        `<span class="record-score">${e.score.toLocaleString()}</span></li>`;
+    });
+    html += '</ol>';
+  }
+  if (runInfo && runInfo.missedPosition) {
+    // Solo se guardan 5 records, asi que fuera del top la posicion exacta es >= 6
+    html += `<p class="records-hint">Quedaste en la posición ${runInfo.missedPosition} o inferior</p>`;
+  }
+  html += '<div class="records-stats">' +
+    `<span>Mejor combo: ${rec.bestCombo}</span>` +
+    `<span>Líneas máximas: ${rec.maxLines}</span>` +
+    '</div>';
+  container.innerHTML = html;
+}
+
+// Inserta la puntuacion de la partida actual en el top y vuelve a pintar
+function saveScore() {
+  if (!pendingRun || !pendingRun.qualifies) return;
+  const rec = loadRecords();
+  const name = (nameInput.value.trim() || 'Anónimo').slice(0, 12);
+  const entry = { name, score: pendingRun.score };
+  rec.top.push(entry);
+  rec.top.sort((a, b) => b.score - a.score);
+  rec.top = rec.top.slice(0, MAX_RECORDS);
+  saveRecords(rec);
+  pendingRun.qualifies = false; // evita guardar dos veces
+  nameEntry.classList.add('hidden');
+  renderRecords(overlayRecords, { highlightIndex: rec.top.findIndex(e => e === entry) });
+}
+
+function resetRecordsAndRender() {
+  clearRecords();
+  renderRecords(startRecords, null);
+  if (!overlay.classList.contains('hidden')) renderRecords(overlayRecords, null);
 }
 
 function drawBlock(context, x, y, colorIndex, size, alpha) {
@@ -221,10 +344,30 @@ function drawNext() {
 }
 
 function endGame() {
+  if (gameOver) return; // idempotente: solo procesa el primer fin de partida
   gameOver = true;
   cancelAnimationFrame(animId);
   overlayTitle.textContent = 'GAME OVER';
   overlayScore.textContent = `Puntuación: ${score.toLocaleString()}`;
+
+  // Actualiza mejor combo y lineas maximas de todos los tiempos
+  const rec = loadRecords();
+  let changed = false;
+  if (maxCombo > rec.bestCombo) { rec.bestCombo = maxCombo; changed = true; }
+  if (lines > rec.maxLines) { rec.maxLines = lines; changed = true; }
+  if (changed) saveRecords(rec);
+
+  pendingRun = { score, qualifies: qualifiesForTop(score, rec.top) };
+  if (pendingRun.qualifies) {
+    nameInput.value = '';
+    nameEntry.classList.remove('hidden');
+    renderRecords(overlayRecords, null);
+    setTimeout(() => { try { nameInput.focus(); } catch (e) { /* ignora */ } }, 0);
+  } else {
+    nameEntry.classList.add('hidden');
+    const missed = (score > 0 && rec.top.length >= MAX_RECORDS) ? MAX_RECORDS + 1 : 0;
+    renderRecords(overlayRecords, { missedPosition: missed });
+  }
   overlay.classList.remove('hidden');
 }
 
@@ -243,6 +386,7 @@ function togglePause() {
 }
 
 function loop(ts) {
+  if (paused || gameOver) return; // no re-encolar frames tras pausa o fin de partida
   const dt = ts - lastTime;
   lastTime = ts;
   dropAccum += dt;
@@ -267,16 +411,24 @@ function init() {
   gameOver = false;
   dropInterval = 1000;
   dropAccum = 0;
+  combo = 0;
+  maxCombo = 0;
+  started = true;
+  pendingRun = null;
   lastTime = performance.now();
   next = randomPiece();
   spawn();
   updateHUD();
+  nameEntry.classList.add('hidden');
+  overlayRecords.innerHTML = '';
   overlay.classList.add('hidden');
+  startOverlay.classList.add('hidden');
   cancelAnimationFrame(animId);
   animId = requestAnimationFrame(loop);
 }
 
 document.addEventListener('keydown', e => {
+  if (!started) return;
   if (e.code === 'KeyP') { togglePause(); return; }
   if (paused || gameOver) return;
   switch (e.code) {
@@ -317,5 +469,16 @@ function toggleTheme() {
 themeToggleBtn.addEventListener('click', toggleTheme);
 restartBtn.addEventListener('click', init);
 
+playBtn.addEventListener('click', init);
+saveScoreBtn.addEventListener('click', saveScore);
+nameInput.addEventListener('keydown', e => {
+  e.stopPropagation();
+  if (e.code === 'Enter') { e.preventDefault(); saveScore(); }
+});
+document.querySelectorAll('.reset-records-btn').forEach(btn => {
+  btn.addEventListener('click', resetRecordsAndRender);
+});
+
 applyTheme();
-init();
+// Al cargar se muestra la pantalla de inicio con la tabla de records; init() arranca la partida
+renderRecords(startRecords, null);
