@@ -247,3 +247,222 @@ body.light-mode #restart-btn {
 body.light-mode #restart-btn:hover {
   background: #6c8cff;
 }
+
+/* ---- Tabla de records ---- */
+#start-title {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: 8px;
+  color: #7aa2f7;
+}
+
+.records-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 240px;
+  max-width: 78vw;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid #2a2a3a;
+  border-radius: 8px;
+  text-align: left;
+}
+
+/* Sin contenido (p. ej. en la pantalla de PAUSA) no se muestra la caja */
+.records-panel:empty {
+  display: none;
+}
+
+.records-empty {
+  font-size: 13px;
+  color: #888;
+  font-style: italic;
+}
+
+.records-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  counter-reset: rec;
+}
+
+.record-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 13px;
+  padding: 3px 6px;
+  border-radius: 4px;
+  counter-increment: rec;
+}
+
+.record-row::before {
+  content: counter(rec) ".";
+  color: #555570;
+  margin-right: 6px;
+}
+
+.record-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.record-score {
+  color: #7aa2f7;
+  font-weight: 700;
+}
+
+.record-row.highlight {
+  background: #7aa2f7;
+  color: #0f0f17;
+}
+
+.record-row.highlight .record-score,
+.record-row.highlight::before {
+  color: #0f0f17;
+}
+
+.records-hint {
+  font-size: 12px;
+  color: #888;
+}
+
+.records-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 12px;
+  color: #aaa;
+  border-top: 1px solid #2a2a3a;
+  padding-top: 6px;
+}
+
+#name-entry {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  width: 240px;
+  max-width: 78vw;
+}
+
+#name-entry.hidden {
+  display: none;
+}
+
+#name-input {
+  flex: 1;
+  min-width: 0;
+  background: #1a1a25;
+  border: 1px solid #3a3a5a;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 13px;
+  color: #e0e0e0;
+  font-family: inherit;
+}
+
+#name-input:focus {
+  outline: none;
+  border-color: #7aa2f7;
+}
+
+#play-btn,
+#save-score-btn {
+  background: #7aa2f7;
+  color: #0f0f17;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 28px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: background 0.15s;
+}
+
+#save-score-btn {
+  padding: 9px 16px;
+}
+
+#play-btn:hover,
+#save-score-btn:hover {
+  background: #9bbdff;
+}
+
+.reset-records-btn {
+  background: transparent;
+  color: #888;
+  border: 1px solid #2a2a3a;
+  border-radius: 6px;
+  padding: 6px 16px;
+  font-size: 12px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.reset-records-btn:hover {
+  background: #22222e;
+  color: #bbb;
+}
+
+/* ---- Records en modo claro ---- */
+body.light-mode #start-title {
+  color: #4c6ef5;
+}
+
+body.light-mode .records-panel {
+  background: rgba(76, 110, 245, 0.06);
+  border-color: #d6d8e6;
+}
+
+body.light-mode .record-score {
+  color: #4c6ef5;
+}
+
+body.light-mode .record-row.highlight {
+  background: #4c6ef5;
+  color: #ffffff;
+}
+
+body.light-mode .record-row.highlight .record-score,
+body.light-mode .record-row.highlight::before {
+  color: #ffffff;
+}
+
+body.light-mode .records-stats {
+  color: #6b6b80;
+  border-color: #d6d8e6;
+}
+
+body.light-mode #name-input {
+  background: #ffffff;
+  border-color: #d0d3e8;
+  color: #3a3a4a;
+}
+
+body.light-mode #play-btn,
+body.light-mode #save-score-btn {
+  background: #4c6ef5;
+  color: #ffffff;
+}
+
+body.light-mode #play-btn:hover,
+body.light-mode #save-score-btn:hover {
+  background: #6c8cff;
+}
+
+body.light-mode .reset-records-btn {
+  border-color: #d6d8e6;
+  color: #8a8aa3;
+}
+
+body.light-mode .reset-records-btn:hover {
+  background: #e4e6f4;
+  color: #555570;
+}
