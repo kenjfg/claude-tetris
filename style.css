@@ -179,6 +179,106 @@ kbd {
   background: #9bbdff;
 }
 
+/* ---- Menú de pausa ---- */
+.menu-box {
+  gap: 10px;
+  min-width: 240px;
+  max-width: 300px;
+  padding: 24px 28px;
+  background: rgba(26, 26, 37, 0.96);
+  border: 1px solid #2a2a3a;
+  border-radius: 10px;
+}
+
+.menu-title {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: 4px;
+  color: #7aa2f7;
+  margin-bottom: 6px;
+}
+
+.menu-btn {
+  width: 100%;
+  background: #22223a;
+  color: #e0e0e0;
+  border: 1px solid #3a3a5a;
+  border-radius: 6px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.menu-btn:hover {
+  background: #32324e;
+}
+
+.menu-controls {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  padding: 2px 0;
+}
+
+.menu-controls.hidden {
+  display: none;
+}
+
+.menu-controls li {
+  font-size: 12px;
+  color: #888;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.menu-level {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.menu-level-control {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.menu-step {
+  background: #7aa2f7;
+  color: #0f0f17;
+  border: none;
+  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.menu-step:hover {
+  background: #9bbdff;
+}
+
+#start-level-value {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 20px;
+  font-weight: 700;
+  color: #7aa2f7;
+  min-width: 26px;
+  text-align: center;
+}
+
 /* ---- Light mode ---- */
 body.light-mode {
   background: #f2f3f9;
@@ -246,4 +346,40 @@ body.light-mode #restart-btn {
 
 body.light-mode #restart-btn:hover {
   background: #6c8cff;
+}
+
+body.light-mode .menu-box {
+  background: rgba(255, 255, 255, 0.97);
+  border-color: #d6d8e6;
+}
+
+body.light-mode .menu-title {
+  color: #4c6ef5;
+}
+
+body.light-mode .menu-btn {
+  background: #eceefa;
+  color: #3a3a4a;
+  border-color: #d0d3e8;
+}
+
+body.light-mode .menu-btn:hover {
+  background: #dfe3f7;
+}
+
+body.light-mode .menu-controls li {
+  color: #6b6b80;
+}
+
+body.light-mode .menu-step {
+  background: #4c6ef5;
+  color: #ffffff;
+}
+
+body.light-mode .menu-step:hover {
+  background: #6c8cff;
+}
+
+body.light-mode #start-level-value {
+  color: #4c6ef5;
 }
