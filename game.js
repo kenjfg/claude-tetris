@@ -246,13 +246,16 @@ function drawBlock(context, x, y, colorIndex, size, alpha) {
   context.globalAlpha = alpha ?? 1;
 
   if (skin.style === 'glow') {
-    // Neon: resplandor por bloque; hay que restaurar shadowBlur despues
-    context.shadowBlur = 14;
-    context.shadowColor = color;
+    // Neon: resplandor por bloque. La pieza fantasma (alpha < 1) se dibuja
+    // plana, sin sombra, para evitar un halo turbio.
+    const solid = (alpha ?? 1) >= 1;
+    if (solid) {
+      context.shadowBlur = 14;
+      context.shadowColor = color;
+    }
     context.fillStyle = color;
     context.fillRect(px, py, s, s);
-    context.shadowBlur = 0;
-    context.shadowColor = 'transparent';
+    if (solid) context.shadowBlur = 0; // restaurar para no afectar al resto
     context.fillStyle = 'rgba(255,255,255,0.18)';
     context.fillRect(px, py, s, 4);
   } else if (skin.style === 'rounded') {
